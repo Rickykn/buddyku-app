@@ -34,7 +34,6 @@ func Connect() (err error) {
 	db.AutoMigrate(&models.Admin{})
 	db.AutoMigrate(&models.Article{})
 	db.AutoMigrate(&models.Point{})
-	db.AutoMigrate(&models.Reward{})
 
 	return nil
 }
