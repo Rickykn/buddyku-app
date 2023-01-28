@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/Rickykn/buddyku-app.git/dtos"
+	"github.com/Rickykn/buddyku-app.git/helpers"
 
 	help "github.com/Rickykn/buddyku-app.git/helpers"
 	"github.com/Rickykn/buddyku-app.git/models"
@@ -9,7 +10,7 @@ import (
 )
 
 type UserService interface {
-	// Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *helpers.JsonResponse, error)
+	Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *helpers.JsonResponse, error)
 	Register(registerInput *dtos.UserRegisterDTO) (*models.User, *help.JsonResponse, error)
 }
 
@@ -45,4 +46,31 @@ func (u *userService) Register(registerInput *dtos.UserRegisterDTO) (*models.Use
 	}
 
 	return newUser, help.HandlerSuccess(201, "Success register account", newUser), nil
+}
+
+func (u *userService) Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *help.JsonResponse, error) {
+	findUser, row, err := u.userRepository.FindOneUser(loginInput.Email)
+	if row == 0 || err != nil {
+		return nil, help.HandlerError(404, "Wrong email or password", nil), err
+	}
+
+	isPasswordCorrect := help.CheckPasswordHash(loginInput.Password, findUser.Password)
+
+	if !isPasswordCorrect {
+		return nil, help.HandlerError(404, "Wrong email or password", nil), err
+	}
+
+	dataToken := &dtos.ResponseTokenDTO{
+		ID:    findUser.ID,
+		Name:  findUser.Name,
+		Email: findUser.Email,
+	}
+
+	tokenString, err := help.CreateJwt(dataToken)
+
+	if err != nil {
+		return nil, help.HandlerError(500, "Server Error", nil), err
+	}
+
+	return &dtos.TokenDTO{IDToken: tokenString}, help.HandlerSuccess(200, "Login success", &dtos.TokenDTO{IDToken: tokenString}), nil
 }

@@ -16,19 +16,34 @@ func Server() *gin.Engine {
 		DB: database.Get(),
 	})
 
+	ar := repositories.NewAdminRepository(&repositories.ARConfig{
+		DB: database.Get(),
+	})
+
 	us := services.NewUserService(&services.USConfig{
 		UserRepository: ur,
 	})
 
+	as := services.NewAdminService(&services.ASConfig{
+		AdminRespository: ar,
+	})
+
 	h := handlers.New(&handlers.HandlerConfig{
 
-		UserService: us,
+		UserService:  us,
+		AdminService: as,
 	})
 
 	users := engine.Group("/users")
 	{
 
 		users.POST("/register", h.RegisterUser)
+		users.POST("/login", h.LoginUser)
+	}
+
+	admin := engine.Group("/admins")
+	{
+		admin.POST("/register", h.RegisterAdmin)
 	}
 
 	if errConnect != nil {

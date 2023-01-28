@@ -42,3 +42,34 @@ func (h *Handler) RegisterUser(c *gin.Context) {
 	}
 
 }
+
+func (h *Handler) LoginUser(c *gin.Context) {
+	var loginInput *dtos.LoginUserDTO
+
+	err := c.ShouldBindJSON(&loginInput)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Bad Request",
+		})
+		return
+
+	}
+
+	_, response, _ := h.userService.Login(loginInput)
+
+	if response.Error {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	} else {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	}
+
+}
