@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Rickykn/buddyku-app.git/dtos"
 	"github.com/Rickykn/buddyku-app.git/models"
@@ -108,4 +109,47 @@ func (h *Handler) UserCreateNewPost(c *gin.Context) {
 		})
 	}
 
+}
+
+func (h *Handler) GetPointUser(c *gin.Context) {
+
+	userContext := c.MustGet("user").(models.User)
+
+	response, _ := h.userService.GetPointUser(userContext.Email)
+
+	if response.Error {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	} else {
+
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	}
+}
+
+func (h *Handler) GetArticleDetail(c *gin.Context) {
+	id := c.Param("id")
+	convId, _ := strconv.Atoi(id)
+	response, _ := h.userService.GetArticleDetail(convId)
+
+	if response.Error {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	} else {
+
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	}
 }

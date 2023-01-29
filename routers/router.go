@@ -41,6 +41,8 @@ func Server() *gin.Engine {
 		users.POST("/register", h.RegisterUser)
 		users.POST("/login", h.LoginUser)
 		users.POST("/article", middlewares.AuthorizeJWT, h.UserCreateNewPost)
+		users.GET("/get-point", middlewares.AuthorizeJWT, h.GetPointUser)
+		users.GET("/detail-article/:id", middlewares.AuthorizeJWT, h.GetArticleDetail)
 	}
 
 	admin := engine.Group("/admins")

@@ -12,6 +12,8 @@ type UserService interface {
 	Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *help.JsonResponse, error)
 	Register(registerInput *dtos.UserRegisterDTO) (*models.User, *help.JsonResponse, error)
 	CreateArticle(articleInput *dtos.ArticleInputDTO) (*models.Article, *help.JsonResponse, error)
+	GetPointUser(email string) (*help.JsonResponse, error)
+	GetArticleDetail(id int) (*help.JsonResponse, error)
 }
 
 type userService struct {
@@ -106,4 +108,28 @@ func (u *userService) CreateArticle(articleInput *dtos.ArticleInputDTO) (*models
 	//return
 
 	return newArticle, help.HandlerSuccess(201, "Success Create New Post", newArticle), nil
+}
+
+func (u *userService) GetPointUser(email string) (*help.JsonResponse, error) {
+
+	findUser, row, err := u.userRepository.FindOneUser(email)
+	if row == 0 || err != nil {
+		return help.HandlerError(404, "User not found", nil), err
+	}
+
+	pointResponse := &dtos.UserGetPointDTO{
+		Point_reward: findUser.Point_reward,
+	}
+
+	return help.HandlerSuccess(200, "Success get point user", pointResponse), err
+
+}
+
+func (u *userService) GetArticleDetail(id int) (*help.JsonResponse, error) {
+	article, err := u.userRepository.GetDetailArticle(id)
+	if err != nil {
+		return help.HandlerError(500, "Article Not found", nil), err
+	}
+
+	return help.HandlerSuccess(200, "Success Get Article Detail", article), err
 }

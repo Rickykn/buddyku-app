@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/Rickykn/buddyku-app.git/dtos"
 	"github.com/Rickykn/buddyku-app.git/models"
 	"gorm.io/gorm"
@@ -8,11 +10,11 @@ import (
 
 type UserRepository interface {
 	CreateUser(email, name, password string) (*models.User, error)
-
 	FindOneUser(email string) (*models.User, int, error)
 	FindPointReward() (*models.Point, int, error)
 	CreateNewArticle(inputArticle *dtos.ArticleInputDTO, user_id int) (*models.Article, error)
 	UpdatePointUser(user_id, newPoint int) (int, error)
+	GetDetailArticle(id int) (*models.Article, error)
 }
 
 type userRepository struct {
@@ -71,4 +73,13 @@ func (u *userRepository) CreateNewArticle(inputArticle *dtos.ArticleInputDTO, us
 func (u *userRepository) UpdatePointUser(user_id, newPoint int) (int, error) {
 	result := u.db.Model(&models.User{}).Where("id = ?", user_id).Update("point_reward", newPoint)
 	return int(result.RowsAffected), result.Error
+}
+
+func (u *userRepository) GetDetailArticle(id int) (*models.Article, error) {
+	var articleDetail *models.Article
+	fmt.Println(id)
+
+	result := u.db.Where("id = ?", id).Preload("User").First(&articleDetail)
+
+	return articleDetail, result.Error
 }

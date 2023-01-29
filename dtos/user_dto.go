@@ -25,3 +25,7 @@ type UserRegisterResponse struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
+
+type UserGetPointDTO struct {
+	Point_reward int `json:"point_reward"`
+}
