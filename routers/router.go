@@ -14,7 +14,7 @@ func Server() *gin.Engine {
 	engine := gin.Default()
 	errConnect := database.Connect()
 
-	engine.Static("/docs", "swaggerui")
+	// engine.Static("/docs", "swaggerui")
 
 	ur := repositories.NewUserRepository(&repositories.URConfig{
 		DB: database.Get(),
