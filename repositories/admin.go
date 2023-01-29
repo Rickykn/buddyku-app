@@ -9,6 +9,7 @@ type AdminRepository interface {
 	CreateAdmin(name, password string) (*models.Admin, error)
 	FindOneAdmin(name string) (*models.Admin, int, error)
 	CreatePoint(point int) (*models.Point, error)
+	FindAllUser() ([]*models.User, error)
 }
 
 type adminRepository struct {
@@ -53,4 +54,12 @@ func (a *adminRepository) CreatePoint(point int) (*models.Point, error) {
 	result := a.db.Create(&newPoint)
 
 	return newPoint, result.Error
+}
+
+func (a *adminRepository) FindAllUser() ([]*models.User, error) {
+	var users []*models.User
+
+	result := a.db.Find(&users)
+
+	return users, result.Error
 }

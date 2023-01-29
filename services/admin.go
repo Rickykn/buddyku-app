@@ -11,6 +11,7 @@ type AdminService interface {
 	SetPoint(pointInput *dtos.RequestPoint) (*models.Point, *help.JsonResponse, error)
 	RegisterAdmin(registerAdminInput *dtos.AdminRegisterDTO) (*models.Admin, *help.JsonResponse, error)
 	LoginAdmin(loginAdminInput *dtos.LoginAdminDTO) (*dtos.TokenAdminDTO, *help.JsonResponse, error)
+	GetAllUser() ([]*models.User, *help.JsonResponse, error)
 }
 
 type adminService struct {
@@ -79,4 +80,13 @@ func (a *adminService) SetPoint(pointInput *dtos.RequestPoint) (*models.Point, *
 	}
 	//return
 	return newPoint, help.HandlerSuccess(201, "Success Create New Point", newPoint), nil
+}
+func (a *adminService) GetAllUser() ([]*models.User, *help.JsonResponse, error) {
+	users, err := a.adminRepository.FindAllUser()
+
+	if err != nil {
+		return nil, help.HandlerError(404, "User Not found", nil), err
+	}
+
+	return users, help.HandlerSuccess(200, "Get All User Success", users), nil
 }

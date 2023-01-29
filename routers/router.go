@@ -40,6 +40,7 @@ func Server() *gin.Engine {
 
 		users.POST("/register", h.RegisterUser)
 		users.POST("/login", h.LoginUser)
+		users.POST("/article", middlewares.AuthorizeJWT, h.UserCreateNewPost)
 	}
 
 	admin := engine.Group("/admins")
@@ -49,6 +50,7 @@ func Server() *gin.Engine {
 		admin.POST("/login", h.LoginAdmin)
 
 		admin.POST("/setpoint", middlewares.AuthorizeJWTAdmin, h.SetPointReward)
+		admin.GET("/all-user", middlewares.AuthorizeJWTAdmin, h.GetAllUser)
 	}
 
 	if errConnect != nil {

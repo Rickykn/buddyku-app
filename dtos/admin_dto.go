@@ -23,3 +23,10 @@ type LoginAdminDTO struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type ResponseAllUser struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	PointReward int    `json:"point_reward"`
+}

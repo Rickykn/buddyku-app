@@ -11,6 +11,7 @@ import (
 type UserService interface {
 	Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *help.JsonResponse, error)
 	Register(registerInput *dtos.UserRegisterDTO) (*models.User, *help.JsonResponse, error)
+	CreateArticle(articleInput *dtos.ArticleInputDTO) (*models.Article, *help.JsonResponse, error)
 }
 
 type userService struct {
@@ -72,4 +73,37 @@ func (u *userService) Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *hel
 	}
 
 	return &dtos.TokenDTO{IDToken: tokenString}, help.HandlerSuccess(200, "Login success", &dtos.TokenDTO{IDToken: tokenString}), nil
+}
+
+func (u *userService) CreateArticle(articleInput *dtos.ArticleInputDTO) (*models.Article, *help.JsonResponse, error) {
+	//find point reward
+	point, row, err := u.userRepository.FindPointReward()
+
+	if row == 0 || err != nil {
+		return nil, help.HandlerError(500, "Server Error", nil), err
+	}
+
+	findUser, row, err := u.userRepository.FindOneUser(articleInput.Email)
+	if row == 0 || err != nil {
+		return nil, help.HandlerError(404, "Wrong email or password", nil), err
+	}
+
+	//create new post
+	newArticle, err := u.userRepository.CreateNewArticle(articleInput, findUser.ID)
+
+	if err != nil {
+		return nil, help.HandlerError(404, "Failed Crete new Aricle", nil), err
+	}
+
+	newPoint := findUser.Point_reward + point.Value_point
+
+	rowUpdated, err := u.userRepository.UpdatePointUser(findUser.ID, newPoint)
+
+	if rowUpdated == 0 || err != nil {
+		return nil, help.HandlerError(404, "Server Error", nil), err
+	}
+
+	//return
+
+	return newArticle, help.HandlerSuccess(201, "Success Create New Post", newArticle), nil
 }

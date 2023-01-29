@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Rickykn/buddyku-app.git/dtos"
+	"github.com/Rickykn/buddyku-app.git/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -69,6 +70,41 @@ func (h *Handler) LoginUser(c *gin.Context) {
 			"message":     response.Message,
 			"status code": response.Code,
 			"data":        response.Data,
+		})
+	}
+
+}
+
+func (h *Handler) UserCreateNewPost(c *gin.Context) {
+	var articleInput *dtos.ArticleInputDTO
+
+	userContext := c.MustGet("user").(models.User)
+
+	err := c.ShouldBindJSON(&articleInput)
+	articleInput.Email = userContext.Email
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Bad Request",
+		})
+		return
+
+	}
+
+	article, response, _ := h.userService.CreateArticle(articleInput)
+
+	if response.Error {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	} else {
+
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        article,
 		})
 	}
 

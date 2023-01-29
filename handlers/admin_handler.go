@@ -114,3 +114,32 @@ func (h *Handler) SetPointReward(c *gin.Context) {
 		})
 	}
 }
+
+func (h *Handler) GetAllUser(c *gin.Context) {
+	var userResponse []*dtos.ResponseAllUser
+	users, response, _ := h.adminService.GetAllUser()
+
+	if response.Error {
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        response.Data,
+		})
+	} else {
+		for _, val := range users {
+			user := &dtos.ResponseAllUser{
+				ID:          val.ID,
+				Name:        val.Name,
+				Email:       val.Email,
+				PointReward: val.Point_reward,
+			}
+
+			userResponse = append(userResponse, user)
+		}
+		c.JSON(response.Code, gin.H{
+			"message":     response.Message,
+			"status code": response.Code,
+			"data":        userResponse,
+		})
+	}
+}
