@@ -10,6 +10,7 @@ type AdminRepository interface {
 	FindOneAdmin(name string) (*models.Admin, int, error)
 	CreatePoint(point int) (*models.Point, error)
 	FindAllUser() ([]*models.User, error)
+	UpdateStatusReward() (int, error)
 }
 
 type adminRepository struct {
@@ -62,4 +63,9 @@ func (a *adminRepository) FindAllUser() ([]*models.User, error) {
 	result := a.db.Find(&users)
 
 	return users, result.Error
+}
+
+func (a *adminRepository) UpdateStatusReward() (int, error) {
+	result := a.db.Model(&models.Point{}).Where("status = ?", "Active").Update("status", "No Active")
+	return int(result.RowsAffected), result.Error
 }

@@ -74,11 +74,18 @@ func (a *adminService) LoginAdmin(loginAdminInput *dtos.LoginAdminDTO) (*dtos.To
 }
 
 func (a *adminService) SetPoint(pointInput *dtos.RequestPoint) (*models.Point, *help.JsonResponse, error) {
+
+	row, err := a.adminRepository.UpdateStatusReward()
+
+	if err != nil || row == 0 {
+		return nil, help.HandlerError(500, "Server Error", nil), err
+	}
+
 	newPoint, err := a.adminRepository.CreatePoint(pointInput.Value_point)
 	if err != nil {
 		return nil, help.HandlerError(500, "Server Error", nil), err
 	}
-	//return
+
 	return newPoint, help.HandlerSuccess(201, "Success Create New Point", newPoint), nil
 }
 func (a *adminService) GetAllUser() ([]*models.User, *help.JsonResponse, error) {
