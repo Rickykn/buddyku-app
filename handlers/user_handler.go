@@ -82,6 +82,7 @@ func (h *Handler) UserCreateNewPost(c *gin.Context) {
 	userContext := c.MustGet("user").(models.User)
 
 	err := c.ShouldBindJSON(&articleInput)
+
 	articleInput.Email = userContext.Email
 
 	if err != nil {
@@ -135,7 +136,9 @@ func (h *Handler) GetPointUser(c *gin.Context) {
 
 func (h *Handler) GetArticleDetail(c *gin.Context) {
 	id := c.Param("id")
+
 	convId, _ := strconv.Atoi(id)
+
 	response, _ := h.userService.GetArticleDetail(convId)
 
 	if response.Error {

@@ -117,6 +117,7 @@ func (h *Handler) SetPointReward(c *gin.Context) {
 
 func (h *Handler) GetAllUser(c *gin.Context) {
 	var userResponse []*dtos.ResponseAllUser
+
 	users, response, _ := h.adminService.GetAllUser()
 
 	if response.Error {
