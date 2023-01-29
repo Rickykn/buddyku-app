@@ -14,7 +14,41 @@ type IdTokenClaims struct {
 	User *dtos.ResponseTokenDTO `json:"user"`
 }
 
-func CreateJwt(dataToken *dtos.ResponseTokenDTO) (string, error) {
+type IdTokenAdminClaims struct {
+	jwt.RegisteredClaims
+	Admin *dtos.ResponseTokenAdminDTO `json:"admin"`
+}
+
+func CreateJwtAdmin(dataAdminToken *dtos.ResponseTokenAdminDTO) (string, error) {
+	expired := os.Getenv("EXPIRED")
+	expiredInt, _ := strconv.Atoi(expired)
+	unixTime := time.Now().Unix()
+	tokenExp := unixTime + int64(expiredInt)
+
+	claims := &IdTokenAdminClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer: os.Getenv("ISSUER"),
+			ExpiresAt: &jwt.NumericDate{
+				Time: time.Unix(tokenExp, 0),
+			},
+			IssuedAt: &jwt.NumericDate{
+				Time: time.Now(),
+			},
+		},
+		Admin: dataAdminToken,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRETKEY")))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func CreateJwtUser(dataToken *dtos.ResponseTokenDTO) (string, error) {
 
 	expired := os.Getenv("EXPIRED")
 	expiredInt, _ := strconv.Atoi(expired)

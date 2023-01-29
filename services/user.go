@@ -2,7 +2,6 @@ package services
 
 import (
 	"github.com/Rickykn/buddyku-app.git/dtos"
-	"github.com/Rickykn/buddyku-app.git/helpers"
 
 	help "github.com/Rickykn/buddyku-app.git/helpers"
 	"github.com/Rickykn/buddyku-app.git/models"
@@ -10,7 +9,7 @@ import (
 )
 
 type UserService interface {
-	Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *helpers.JsonResponse, error)
+	Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *help.JsonResponse, error)
 	Register(registerInput *dtos.UserRegisterDTO) (*models.User, *help.JsonResponse, error)
 }
 
@@ -66,7 +65,7 @@ func (u *userService) Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *hel
 		Email: findUser.Email,
 	}
 
-	tokenString, err := help.CreateJwt(dataToken)
+	tokenString, err := help.CreateJwtUser(dataToken)
 
 	if err != nil {
 		return nil, help.HandlerError(500, "Server Error", nil), err

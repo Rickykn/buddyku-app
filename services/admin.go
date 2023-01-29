@@ -8,9 +8,9 @@ import (
 )
 
 type AdminService interface {
-	// SetPoint()
+	SetPoint(pointInput *dtos.RequestPoint) (*models.Point, *help.JsonResponse, error)
 	RegisterAdmin(registerAdminInput *dtos.AdminRegisterDTO) (*models.Admin, *help.JsonResponse, error)
-	// Login(loginInput *dtos.LoginUserDTO) (*dtos.TokenDTO, *help.JsonResponse, error)
+	LoginAdmin(loginAdminInput *dtos.LoginAdminDTO) (*dtos.TokenAdminDTO, *help.JsonResponse, error)
 }
 
 type adminService struct {
@@ -43,4 +43,40 @@ func (a *adminService) RegisterAdmin(registerAdminInput *dtos.AdminRegisterDTO) 
 	}
 
 	return newAdmin, help.HandlerSuccess(201, "Success register admin", newAdmin), nil
+}
+
+func (a *adminService) LoginAdmin(loginAdminInput *dtos.LoginAdminDTO) (*dtos.TokenAdminDTO, *help.JsonResponse, error) {
+	findAdmin, row, err := a.adminRepository.FindOneAdmin(loginAdminInput.Name)
+	if row == 0 || err != nil {
+		return nil, help.HandlerError(404, "Wrong email or password", nil), err
+	}
+
+	isPasswordCorrect := help.CheckPasswordHash(loginAdminInput.Password, findAdmin.Password)
+
+	if !isPasswordCorrect {
+		return nil, help.HandlerError(404, "Wrong email or password", nil), err
+	}
+
+	dataToken := &dtos.ResponseTokenAdminDTO{
+		ID:   findAdmin.ID,
+		Name: findAdmin.Name,
+		Role: findAdmin.Role,
+	}
+
+	tokenString, err := help.CreateJwtAdmin(dataToken)
+
+	if err != nil {
+		return nil, help.HandlerError(500, "Server Error", nil), err
+	}
+
+	return &dtos.TokenAdminDTO{IDToken: tokenString}, help.HandlerSuccess(200, "Login success", &dtos.TokenDTO{IDToken: tokenString}), nil
+}
+
+func (a *adminService) SetPoint(pointInput *dtos.RequestPoint) (*models.Point, *help.JsonResponse, error) {
+	newPoint, err := a.adminRepository.CreatePoint(pointInput.Value_point)
+	if err != nil {
+		return nil, help.HandlerError(500, "Server Error", nil), err
+	}
+	//return
+	return newPoint, help.HandlerSuccess(201, "Success Create New Point", newPoint), nil
 }

@@ -8,3 +8,18 @@ type AdminRegisterResponse struct {
 	Name string `json:"name"`
 	Role string `json:"role"`
 }
+
+type ResponseTokenAdminDTO struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
+
+type TokenAdminDTO struct {
+	IDToken string `json:"idToken"`
+}
+
+type LoginAdminDTO struct {
+	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}

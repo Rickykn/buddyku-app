@@ -7,7 +7,8 @@ import (
 
 type AdminRepository interface {
 	CreateAdmin(name, password string) (*models.Admin, error)
-	FindOneAdmin(email string) (*models.Admin, int, error)
+	FindOneAdmin(name string) (*models.Admin, int, error)
+	CreatePoint(point int) (*models.Point, error)
 }
 
 type adminRepository struct {
@@ -24,21 +25,32 @@ func NewAdminRepository(c *ARConfig) AdminRepository {
 	}
 }
 
-func (u *adminRepository) CreateAdmin(name, password string) (*models.Admin, error) {
+func (a *adminRepository) CreateAdmin(name, password string) (*models.Admin, error) {
 	newAdmin := &models.Admin{
 		Name:     name,
 		Password: password,
 		Role:     "admin",
 	}
 
-	result := u.db.Create(&newAdmin)
+	result := a.db.Create(&newAdmin)
 
 	return newAdmin, result.Error
 }
-func (u *adminRepository) FindOneAdmin(email string) (*models.Admin, int, error) {
+func (a *adminRepository) FindOneAdmin(name string) (*models.Admin, int, error) {
 	var admin *models.Admin
 
-	result := u.db.Where("email = ?", email).First(&admin)
+	result := a.db.Where("name = ?", name).First(&admin)
 
 	return admin, int(result.RowsAffected), result.Error
+}
+
+func (a *adminRepository) CreatePoint(point int) (*models.Point, error) {
+	newPoint := &models.Point{
+		Value_point: point,
+		Status:      "Active",
+	}
+
+	result := a.db.Create(&newPoint)
+
+	return newPoint, result.Error
 }

@@ -3,13 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/Rickykn/buddyku-app.git/routers"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -23,22 +18,29 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	gin.SetMode(gin.DebugMode)
+	// gin.SetMode(gin.DebugMode)
 
-	server := http.Server{
-		Addr:    ":8080",
-		Handler: routers.Server(),
+	// server := http.Server{
+	// 	Addr:    ":8080",
+	// 	Handler: routers.Server(),
+	// }
+
+	// go func() {
+	// 	if err := server.ListenAndServe(); err != nil {
+	// 		log.Printf("Server Listen Error : %s ", err.Error())
+	// 	}
+	// }()
+
+	// signals := make(chan os.Signal)
+
+	// signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+	// <-signals
+	// log.Println("Server is Shutdown")
+
+	server := routers.Server()
+
+	err := server.Run()
+	if err != nil {
+		panic(err)
 	}
-
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Printf("Server Listen Error : %s ", err.Error())
-		}
-	}()
-
-	signals := make(chan os.Signal)
-
-	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
-	<-signals
-	log.Println("Server is Shutdown")
 }

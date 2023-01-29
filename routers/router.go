@@ -3,13 +3,14 @@ package routers
 import (
 	"github.com/Rickykn/buddyku-app.git/database"
 	"github.com/Rickykn/buddyku-app.git/handlers"
+	"github.com/Rickykn/buddyku-app.git/middlewares"
 	"github.com/Rickykn/buddyku-app.git/repositories"
 	"github.com/Rickykn/buddyku-app.git/services"
 	"github.com/gin-gonic/gin"
 )
 
 func Server() *gin.Engine {
-	engine := gin.New()
+	engine := gin.Default()
 	errConnect := database.Connect()
 
 	ur := repositories.NewUserRepository(&repositories.URConfig{
@@ -42,8 +43,12 @@ func Server() *gin.Engine {
 	}
 
 	admin := engine.Group("/admins")
+
 	{
 		admin.POST("/register", h.RegisterAdmin)
+		admin.POST("/login", h.LoginAdmin)
+
+		admin.POST("/setpoint", middlewares.AuthorizeJWTAdmin, h.SetPointReward)
 	}
 
 	if errConnect != nil {
